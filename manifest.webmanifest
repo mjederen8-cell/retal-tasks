@@ -1,0 +1,14 @@
+{
+  "name": "Retal Tasks",
+  "short_name": "Retal Tasks",
+  "description": "منظّمة مهامك اليومية 🎀",
+  "start_url": ".",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#ffeaf4",
+  "theme_color": "#ff5fa2",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

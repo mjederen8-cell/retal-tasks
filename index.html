@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retal Tasks 🎀 — خطتي</title>
+<meta name="theme-color" content="#ff5fa2">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="plan">
+
+<header class="app-header">
+  <div class="logo">
+    <span class="logo-emoji">🎀</span>
+    <div>
+      <h1>Retal Tasks</h1>
+      <p class="tagline">منظّمة مهامك اليومية ✨</p>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html" class="nav-link active">🗓️ خطتي</a>
+    <a href="today.html" class="nav-link">🌞 مهام اليوم</a>
+    <button id="notify-btn" class="bell-btn" title="فعّلي إشعارات التذكير">🔔</button>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="card add-card">
+    <h2 class="card-title">✍️ أضيفي مهمة جديدة</h2>
+    <form id="add-form" class="add-form">
+      <input type="text" id="task-title" placeholder="وش المهمة يا قمر؟ 💭" maxlength="80" required>
+      <div class="form-row">
+        <select id="task-emoji" title="نوع المهمة">
+          <option value="📚">📚 دراسة</option>
+          <option value="💼">💼 عمل</option>
+          <option value="🏠">🏠 منزل</option>
+          <option value="🛍️">🛍️ تسوق</option>
+          <option value="💅">💅 عناية</option>
+          <option value="🏃‍♀️">🏃‍♀️ رياضة</option>
+          <option value="💌">💌 اجتماعي</option>
+          <option value="🌸">🌸 أخرى</option>
+        </select>
+        <input type="date" id="task-date" required>
+        <input type="time" id="task-time" title="وقت المهمة (اختياري)">
+      </div>
+      <div class="form-row">
+        <select id="task-repeat" title="تكرار المهمة">
+          <option value="none">✨ مرة واحدة</option>
+          <option value="daily">🔁 كل يوم</option>
+          <option value="weekly">🗓️ كل أسبوع</option>
+          <option value="monthly">📅 كل شهر</option>
+        </select>
+        <button type="submit" class="btn-primary">أضيفي 💖</button>
+      </div>
+      <p class="form-hint">⏰ حددي وقتًا للمهمة عشان يوصلك تذكير لطيف وقتها 💌 (اختياري)</p>
+    </form>
+  </section>
+
+  <section id="groups" class="groups"></section>
+
+</main>
+
+<footer class="app-footer">صُنع بحب لريتال 💗</footer>
+
+<div id="toast-layer"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

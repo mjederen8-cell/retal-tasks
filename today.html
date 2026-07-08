@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retal Tasks 🌞 — مهام اليوم</title>
+<meta name="theme-color" content="#ff5fa2">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="today">
+
+<header class="app-header">
+  <div class="logo">
+    <span class="logo-emoji">🎀</span>
+    <div>
+      <h1>Retal Tasks</h1>
+      <p class="tagline">منظّمة مهامك اليومية ✨</p>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html" class="nav-link">🗓️ خطتي</a>
+    <a href="today.html" class="nav-link active">🌞 مهام اليوم</a>
+    <button id="notify-btn" class="bell-btn" title="فعّلي إشعارات التذكير">🔔</button>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="card hero-card">
+    <h2 id="greeting" class="greeting"></h2>
+    <p id="today-date" class="today-date"></p>
+  </section>
+
+  <section class="card meter-card">
+    <div class="meter-top">
+      <span id="meter-emoji" class="meter-emoji">🐣</span>
+      <div class="meter-info">
+        <p id="meter-message" class="meter-message"></p>
+        <p id="meter-count" class="meter-count"></p>
+      </div>
+      <span id="meter-percent" class="meter-percent">0%</span>
+    </div>
+    <div class="progress-track">
+      <div id="progress-fill" class="progress-fill"><span class="progress-spark">✨</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">📝 مهامك اليوم</h2>
+    <ul id="today-list" class="task-list"></ul>
+    <p id="today-empty" class="empty-state" hidden>
+      ما فيه مهام لليوم! 🦋<br>
+      <a href="index.html" class="empty-link">أضيفي مهام من صفحة خطتي 🎀</a>
+    </p>
+  </section>
+
+</main>
+
+<footer class="app-footer">صُنع بحب لريتال 💗</footer>
+
+<div id="confetti-layer"></div>
+<div id="toast-layer"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
