@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c4361">
+<title>سيرا للصيانة</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Marcellus&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="brand">
+  <div class="brand-inner">
+    <div class="brand-top">
+      <img class="brand-logo" src="logo-light.png" alt="سيرا التنفيذية SERA">
+    </div>
+    <div>
+      <div class="eyebrow">Maintenance Request</div>
+      <h1>طلب خدمة صيانة</h1>
+      <p>ارفع طلبك خلال دقيقة، وتابع حالته برقم الطلب.</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-new" aria-selected="true" aria-controls="view-new">طلب جديد</button>
+      <button class="tab" role="tab" id="tab-track" aria-selected="false" aria-controls="view-track">متابعة طلب</button>
+    </div>
+
+    <!-- New request -->
+    <div id="view-new" role="tabpanel" aria-labelledby="tab-new">
+      <form id="req-form" novalidate>
+        <p class="demo-banner" id="demo-banner" hidden>وضع التجربة: الطلبات تُحفظ على هذا الجهاز فقط حتى يُربط البرنامج بقاعدة البيانات.</p>
+
+        <div class="row">
+          <label class="field">
+            <span class="label">الاسم <span class="req">*</span></span>
+            <input type="text" id="f-name" name="name" autocomplete="name" maxlength="80" required>
+          </label>
+          <label class="field">
+            <span class="label">رقم الجوال <span class="req">*</span></span>
+            <input type="tel" id="f-phone" name="phone" class="ltr" inputmode="tel" autocomplete="tel" placeholder="05XXXXXXXX" maxlength="20" required>
+          </label>
+        </div>
+
+        <div class="row">
+          <label class="field">
+            <span class="label">المشروع / العمارة <small>(اختياري)</small></span>
+            <input type="text" id="f-building" name="building" maxlength="80" placeholder="مثال: عمارة 3">
+          </label>
+          <label class="field">
+            <span class="label">رقم الشقة <span class="req">*</span></span>
+            <input type="text" id="f-unit" name="unit" maxlength="20" placeholder="مثال: 12" required>
+          </label>
+        </div>
+
+        <fieldset>
+          <legend class="label">نوع الخدمة <span class="req">*</span></legend>
+          <div class="chips" id="services"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="label">الأولوية</legend>
+          <div class="seg">
+            <label class="chip"><input type="radio" name="priority" id="p-normal" value="normal" checked><span><b>عادي</b></span></label>
+            <label class="chip"><input type="radio" name="priority" id="p-urgent" value="urgent"><span><b>عاجل</b></span></label>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span class="label">ملاحظاتك <small>(وصف المشكلة، أفضل وقت للزيارة…)</small></span>
+          <textarea id="f-notes" name="notes" maxlength="1000" placeholder="مثال: تسريب مياه تحت مغسلة المطبخ، الأفضل الزيارة بعد العصر."></textarea>
+        </label>
+
+        <p class="error" id="form-error" role="alert" hidden></p>
+        <button class="btn" type="submit" id="submit-btn">إرسال الطلب</button>
+      </form>
+
+      <div class="ticket" id="success" hidden>
+        <div class="check" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <h2>تم استلام طلبك</h2>
+        <p class="note">احتفظ برقم الطلب لمتابعة حالته</p>
+        <div class="ticket-id" id="ticket-id">SR-0000</div>
+        <div class="actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="copy-btn">نسخ الرقم</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="track-this">متابعة الطلب</button>
+          <button class="btn btn-sm" type="button" id="another">طلب جديد</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Track -->
+    <div id="view-track" role="tabpanel" aria-labelledby="tab-track" hidden>
+      <form id="track-form" novalidate>
+        <div class="row">
+          <label class="field">
+            <span class="label">رقم الطلب</span>
+            <input type="text" id="t-id" class="ltr" placeholder="SR-1001" maxlength="12" required>
+          </label>
+          <label class="field">
+            <span class="label">رقم الجوال المسجّل</span>
+            <input type="tel" id="t-phone" class="ltr" inputmode="tel" placeholder="05XXXXXXXX" maxlength="20" required>
+          </label>
+        </div>
+        <p class="error" id="track-error" role="alert" hidden></p>
+        <button class="btn" type="submit" id="track-btn">عرض الحالة</button>
+      </form>
+      <div id="track-result" style="margin-top:18px" hidden></div>
+    </div>
+  </section>
+</main>
+
+<footer><span class="mono">SERA</span> · سيرا التنفيذية</footer>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script>
+(function () {
+  const A = window.SeraAPI;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  if (A.DEMO) $("demo-banner").hidden = false;
+
+  // Service chips
+  $("services").innerHTML = Object.entries(A.SERVICES).map(([k, s]) =>
+    `<label class="chip"><input type="radio" name="service" id="s-${k}" value="${k}"><span><b>${s.ar}</b><i>${s.en}</i></span></label>`
+  ).join("");
+
+  // Tabs
+  function showTab(which) {
+    const isNew = which === "new";
+    $("tab-new").setAttribute("aria-selected", isNew);
+    $("tab-track").setAttribute("aria-selected", !isNew);
+    $("view-new").hidden = !isNew;
+    $("view-track").hidden = isNew;
+  }
+  $("tab-new").onclick = () => showTab("new");
+  $("tab-track").onclick = () => showTab("track");
+  if (location.hash === "#track") showTab("track");
+
+  // Remember the resident's details on this device
+  try {
+    const saved = JSON.parse(localStorage.getItem("sera-resident") || "{}");
+    ["name", "phone", "building", "unit"].forEach(k => { if (saved[k]) $("f-" + k).value = saved[k]; });
+    if (saved.phone) $("t-phone").value = saved.phone;
+  } catch (e) {}
+
+  function showErr(el, msg) { el.textContent = msg; el.hidden = !msg; }
+
+  // Submit
+  $("req-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const data = {
+      name: $("f-name").value.trim(),
+      phone: $("f-phone").value.trim(),
+      building: $("f-building").value.trim(),
+      unit: $("f-unit").value.trim(),
+      service: (f.querySelector("input[name=service]:checked") || {}).value || "",
+      priority: f.querySelector("input[name=priority]:checked").value,
+      notes: $("f-notes").value.trim()
+    };
+    const digits = data.phone.replace(/\D/g, "");
+    if (!data.name) return showErr($("form-error"), "اكتب الاسم.");
+    if (digits.length < 9) return showErr($("form-error"), "رقم الجوال غير مكتمل، اكتبه بصيغة 05XXXXXXXX.");
+    if (!data.unit) return showErr($("form-error"), "اكتب رقم الشقة.");
+    if (!data.service) return showErr($("form-error"), "اختر نوع الخدمة.");
+    showErr($("form-error"), "");
+
+    const btn = $("submit-btn");
+    btn.disabled = true; btn.textContent = "جارٍ الإرسال…";
+    try {
+      const item = await A.create(data);
+      try { localStorage.setItem("sera-resident", JSON.stringify({ name: data.name, phone: data.phone, building: data.building, unit: data.unit })); } catch (e) {}
+      $("ticket-id").textContent = item.id;
+      $("t-id").value = item.id; $("t-phone").value = data.phone;
+      f.hidden = true; $("success").hidden = false;
+    } catch (err) {
+      showErr($("form-error"), "لم يُرسل الطلب: " + err.message + ". تأكد من الاتصال بالإنترنت وأعد المحاولة.");
+    } finally {
+      btn.disabled = false; btn.textContent = "إرسال الطلب";
+    }
+  });
+
+  $("copy-btn").onclick = async () => {
+    const id = $("ticket-id").textContent;
+    try { await navigator.clipboard.writeText(id); $("copy-btn").textContent = "تم النسخ"; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($("ticket-id")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  };
+  $("another").onclick = () => {
+    const f = $("req-form");
+    $("f-notes").value = ""; f.querySelectorAll("input[name=service]").forEach(i => i.checked = false);
+    $("p-normal").checked = true; $("copy-btn").textContent = "نسخ الرقم";
+    f.hidden = false; $("success").hidden = true;
+  };
+  $("track-this").onclick = () => { showTab("track"); $("track-form").requestSubmit(); };
+
+  // Track
+  $("track-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = $("t-id").value.trim(), phone = $("t-phone").value.trim();
+    if (!id || !phone) return showErr($("track-error"), "اكتب رقم الطلب ورقم الجوال.");
+    showErr($("track-error"), "");
+    const btn = $("track-btn"); btn.disabled = true;
+    try {
+      const it = await A.track(id, phone);
+      const box = $("track-result");
+      box.hidden = false;
+      if (!it) { box.innerHTML = `<p class="empty">لم نجد طلباً بهذا الرقم وهذا الجوال. تأكد من البيانات.</p>`; return; }
+      const order = ["new", "progress", "done"];
+      const idx = order.indexOf(it.status);
+      const svc = A.SERVICES[it.service] || { ar: it.service };
+      const st = A.STATUS[it.status] || { ar: it.status };
+      box.innerHTML = `
+        <div class="result">
+          <div class="result-head"><span class="mono" style="font-size:20px">${esc(it.id)}</span><span class="pill ${esc(it.status)}">${st.ar}</span></div>
+          ${it.status === "cancelled" ? "" : `<ol class="steps">${order.map((s, i) => `<li class="${i <= idx ? "on" : ""}">${A.STATUS[s].ar}</li>`).join("")}</ol>`}
+          <dl class="kv">
+            <dt>الخدمة</dt><dd>${esc(svc.ar)}${it.priority === "urgent" ? " · عاجل" : ""}</dd>
+            <dt>الشقة</dt><dd>${esc([it.building, it.unit].filter(Boolean).join(" / "))}</dd>
+            <dt>تاريخ الطلب</dt><dd>${esc(A.fmtDate(it.createdAt))}</dd>
+            <dt>آخر تحديث</dt><dd>${esc(A.fmtDate(it.updatedAt))}</dd>
+            ${it.notes ? `<dt>ملاحظاتك</dt><dd>${esc(it.notes)}</dd>` : ""}
+            ${it.adminNote ? `<dt>رد الصيانة</dt><dd><b>${esc(it.adminNote)}</b></dd>` : ""}
+          </dl>
+        </div>`;
+    } catch (err) {
+      showErr($("track-error"), "تعذّر جلب الحالة: " + err.message);
+    } finally { btn.disabled = false; }
+  });
+})();
+</script>
+</body>
+</html>

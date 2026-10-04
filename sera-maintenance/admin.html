@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c4361">
+<meta name="robots" content="noindex">
+<title>سيرا للصيانة · الإدارة</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Marcellus&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="wide">
+
+<header class="brand">
+  <div class="brand-inner">
+    <div class="brand-top">
+      <img class="brand-logo" src="logo-light.png" alt="سيرا التنفيذية SERA">
+      <a class="brand-link" href="index.html">صفحة العميل</a>
+    </div>
+    <div>
+      <div class="eyebrow">Maintenance Desk</div>
+      <h1>طلبات الصيانة</h1>
+      <p id="sub">جارٍ التحميل…</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="stats" id="stats">
+    <button class="stat" data-f="all" aria-pressed="true"><b id="c-all">–</b><span>كل الطلبات</span></button>
+    <button class="stat new" data-f="new" aria-pressed="false"><b id="c-new">–</b><span>جديد</span></button>
+    <button class="stat progress" data-f="progress" aria-pressed="false"><b id="c-progress">–</b><span>قيد التنفيذ</span></button>
+    <button class="stat done" data-f="done" aria-pressed="false"><b id="c-done">–</b><span>مكتمل</span></button>
+  </div>
+
+  <section class="panel" style="display:flex;flex-direction:column;gap:14px">
+    <p class="demo-banner" id="demo-banner" hidden>وضع التجربة: تظهر هنا الطلبات المرفوعة من هذا الجهاز فقط. اربط البرنامج بـ Google Sheets لاستقبال طلبات كل العملاء.</p>
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="بحث بالاسم، الجوال، رقم الشقة أو رقم الطلب">
+      <select id="svc" aria-label="نوع الخدمة"><option value="">كل الخدمات</option></select>
+      <button class="btn btn-ghost btn-sm" id="refresh" type="button">تحديث</button>
+    </div>
+    <p class="error" id="err" role="alert" hidden></p>
+    <div class="list" id="list">
+      <div class="empty">لا توجد طلبات بعد. عند رفع العميل طلباً من صفحة العميل سيظهر هنا مباشرة.</div>
+    </div>
+  </section>
+</main>
+
+<footer><span class="mono">SERA</span> · سيرا التنفيذية</footer>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script>
+(function () {
+  const A = window.SeraAPI;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let items = [], filter = "all", busy = false;
+
+  if (A.DEMO) $("demo-banner").hidden = false;
+  $("svc").insertAdjacentHTML("beforeend", Object.entries(A.SERVICES).map(([k, s]) => `<option value="${k}">${s.ar}</option>`).join(""));
+
+  async function load() {
+    if (busy) return; busy = true;
+    try {
+      items = await A.list();
+      $("err").hidden = true;
+      $("sub").textContent = "آخر تحديث " + new Date().toLocaleTimeString("ar-SA-u-nu-latn", { hour: "numeric", minute: "2-digit" });
+      render();
+    } catch (e) {
+      $("err").textContent = "تعذّر تحميل الطلبات: " + e.message; $("err").hidden = false;
+    } finally { busy = false; }
+  }
+
+  function render() {
+    const count = (s) => items.filter(x => x.status === s).length;
+    $("c-all").textContent = items.length;
+    ["new", "progress", "done"].forEach(s => $("c-" + s).textContent = count(s));
+
+    const q = $("q").value.trim().toLowerCase();
+    const svc = $("svc").value;
+    const shown = items.filter(x =>
+      (filter === "all" || x.status === filter) &&
+      (!svc || x.service === svc) &&
+      (!q || [x.id, x.name, x.phone, x.unit, x.building, x.notes].join(" ").toLowerCase().includes(q))
+    );
+    // Urgent new requests first, then newest
+    shown.sort((a, b) => (rank(a) - rank(b)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+
+    if (!items.length) { $("list").innerHTML = `<div class="empty">لا توجد طلبات بعد. عند رفع العميل طلباً من صفحة العميل سيظهر هنا مباشرة.</div>`; return; }
+    if (!shown.length) { $("list").innerHTML = `<div class="empty">لا توجد طلبات تطابق البحث.</div>`; return; }
+
+    $("list").innerHTML = shown.map(x => {
+      const svcName = (A.SERVICES[x.service] || { ar: x.service }).ar;
+      return `
+      <article class="req-card ${esc(x.status)} ${x.priority === "urgent" ? "urgent" : ""}" data-id="${esc(x.id)}">
+        <div class="req-top">
+          <div class="req-title"><span class="mono">${esc(x.id)}</span><span>${esc(svcName)}</span><span class="urgent-tag">عاجل</span></div>
+          <span class="pill ${esc(x.status)}">${(A.STATUS[x.status] || { ar: x.status }).ar}</span>
+        </div>
+        <div class="req-meta">
+          <span>${esc(x.name)}</span>
+          <span class="mono">${esc(x.phone)}</span>
+          <span>الشقة: ${esc([x.building, x.unit].filter(Boolean).join(" / "))}</span>
+          <span>${esc(A.fmtDate(x.createdAt))}</span>
+        </div>
+        ${x.notes ? `<p class="req-notes">${esc(x.notes)}</p>` : ""}
+        <div class="req-ctrl">
+          <select aria-label="حالة الطلب" id="st-${esc(x.id)}">
+            ${Object.entries(A.STATUS).map(([k, s]) => `<option value="${k}" ${k === x.status ? "selected" : ""}>${s.ar}</option>`).join("")}
+          </select>
+          <input type="text" id="nt-${esc(x.id)}" maxlength="300" placeholder="رد للعميل (يظهر له عند المتابعة)" value="${esc(x.adminNote)}">
+          <button class="btn btn-sm save" type="button">حفظ</button>
+        </div>
+      </article>`;
+    }).join("");
+  }
+  function rank(x) { return x.status === "new" ? (x.priority === "urgent" ? 0 : 1) : x.status === "progress" ? 2 : 3; }
+
+  $("list").addEventListener("click", async (e) => {
+    const btn = e.target.closest(".save"); if (!btn) return;
+    const card = btn.closest(".req-card"), id = card.dataset.id;
+    const patch = { status: $("st-" + id).value, adminNote: $("nt-" + id).value.trim() };
+    btn.disabled = true; btn.textContent = "جارٍ الحفظ…";
+    try {
+      const updated = await A.update(id, patch);
+      const i = items.findIndex(x => x.id === id); if (i > -1) items[i] = Object.assign(items[i], updated || patch);
+      render();
+    } catch (err) {
+      btn.disabled = false; btn.textContent = "حفظ";
+      $("err").textContent = "لم يُحفظ التعديل على " + id + ": " + err.message; $("err").hidden = false;
+    }
+  });
+
+  $("stats").addEventListener("click", (e) => {
+    const b = e.target.closest(".stat"); if (!b) return;
+    filter = b.dataset.f;
+    document.querySelectorAll(".stat").forEach(s => s.setAttribute("aria-pressed", s === b));
+    render();
+  });
+  $("q").addEventListener("input", render);
+  $("svc").addEventListener("change", render);
+  $("refresh").onclick = load;
+
+  load();
+  // Refresh every minute while the page is visible, unless someone is typing a reply
+  setInterval(() => {
+    if (document.visibilityState === "visible" && !document.activeElement.closest(".req-ctrl")) load();
+  }, 60000);
+})();
+</script>
+</body>
+</html>
